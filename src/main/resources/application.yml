@@ -1,0 +1,104 @@
+#camel.springboot.main-run-controller=true   //To keep the main thread blocked so that Camel stays up
+#route.from = jms:invoices
+#my changes
+
+kafka:
+    server : localhost
+    port : 9092
+    topic : 
+      journal: 
+        csv: journal-csv-topic
+        transformed: journal-topic
+      core: 
+        csv: glcore-csv-topic
+        transformed: glcore-topic
+      fep:
+        csv: fep-csv-topic
+        transformed: fep-topic
+      test1:
+        csv: test1-csv-topic
+        transformed: test1-topic
+      test2:
+        csv: test2-csv-topic
+        transformed: test2-topic
+      exceptions:
+        dispense: dispense-error-topic
+        unimparted: unimparted-error-topic
+      matched: matched-item-topic
+        
+    channel : my-chanel
+    
+ksql:
+  rest:
+    api:
+      endpoint: 
+        ksql: http://localhost:8088/ksql
+        query: http://localhost:8088/query
+        info: http://localhost:8088/info
+        status: http://localhost:8088/status
+        
+logging:
+  level:
+    org:
+      apache:
+        http: INFO
+    root: INFO
+#  file: /Users/user/Documents/workspace-spring-tool-suite-4-4.1.1.RELEASE/matching/${spring.application.name}.log
+        
+empty:
+  byte:
+    connection:
+      count: 5
+
+maven:
+ basedir: @project.basedir@
+ java: @java.version@
+
+
+
+file:
+  location: Files/
+  directory:
+    path: ${file.location}
+    fullpath: ${maven.basedir}/${file.location}
+#    path: /Users/user/Documents/workspace-spring-tool-suite-4-4.1.1.RELEASE/matching/C://
+      
+elasticsearch:
+  clustername: docker-cluster
+  host: localhost
+  port: 9300
+
+  index: 
+    name: my_index
+  user:
+    type: user
+  
+  
+# Local Elasticsearch config
+spring:
+  application:
+    name: match-module
+  data:
+    elasticsearch:
+      repositories:
+        enabled: true
+      cluster-nodes: localhost:9300
+      cluster-name: docker-cluster
+  main:
+    allow-bean-definition-overriding: true
+    
+server:
+  port: 8888
+  servlet:
+    context-path: /${spring.application.name} # or java -jar app.jar --server.servlet.context-path=/baeldung
+
+
+# this has to be updated when the field in each entity changes
+criteria:
+  journal:
+    fields: j.accountNo,j.amount,j.bankTrnType,j.journalTime,j.errorMsg,j.journalName,j.pan,j.rrn,j.stan,j.terminalId,j.transactionId,j.transactionType,j.created
+  fep:
+    fields: f.bin,f.bank,f.TransactionType,f.CardType,f.terminalId,f.messageType,f.retrievalReferenceNR,f.datetimeTranGMT,f.datetimeTranLOCAL,f.fromAccountID,f.tranAmountREQ,f.tranAmountRSP,f.stan,f.datetimeREQ,f.pan,f.rspCodeRSP,f.tranPostilionOriginated,f.tranCompleted,f.tranReversed,f.crdr
+  core:
+    fields: c.trnRefNo,c.termId,c.maskedPan,c.fwdInsId,c.rrn,c.stan,c.acBranch,c.acNo,c.acCCY,c.trnDT,c.drCrInd,c.lcyAmount,c.fcyAmount,c.narration,c.timestamp,c.valueDT,c.relatedCustomer,c.acqInsID,c.authID,c.userID
+ 
